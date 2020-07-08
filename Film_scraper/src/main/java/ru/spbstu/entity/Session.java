@@ -2,9 +2,11 @@ package ru.spbstu.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 
 @Data
 @NoArgsConstructor
@@ -17,12 +19,12 @@ public class Session {
   @Column(name = "id")
   private Integer id;
 
-  private LocalDate date;
+  private LocalDateTime dateTime;
 
   private Integer cost;
 
-  public Session(LocalDate date, Integer cost) {
-    this.date = date;
+  public Session(LocalDateTime dateTime, Integer cost) {
+    this.dateTime = dateTime;
     this.cost = cost;
   }
 }

@@ -1,35 +1,43 @@
 package ru.spbstu.scraper;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+
 @Component
 public class Scraper {
 
     final static private  WebDriver driver;
     final static private  String url;
-    private static Week week;
     private static String year;
     private static String country;
     private static String director;
     private static String genre;
     private static String duration;
     private static String actors;
-    List<Film> previousDaysFilms = new ArrayList<>();
+    private static final List<Film> previousDaysFilms = new ArrayList<>();
 
     static {
-        System.setProperty("webdriver.gecko.driver", "drivers\\geckodriver.exe");
+        System.setProperty("webdriver.gecko.driver", "Film_scraper\\drivers\\geckodriver.exe");
         url = "https://www.kinopoisk.ru/afisha/city/2/";
-        driver = new FirefoxDriver();
+        Proxy proxy = new Proxy();
+        proxy.setHttpProxy("localhost:8888");
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability(CapabilityType.PROXY, proxy);
+        driver = new FirefoxDriver(new FirefoxOptions(capabilities));
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        week = new Week();
+
     }
 
     private List<String> getFilmHrefs(String day) {//Получаем список со всеми ссылками на фильмы
@@ -62,7 +70,7 @@ public class Scraper {
         return sessionList;
     }
 
-    public List<Film> getFilms(String day) {//Если тут ввести что-то кроме week.getDay(0-6) то все упадет, но пока так
+    public List<Film> getFilms(String day) {
         driver.get(url + "day_view/" + day);
         List<Film> thisDayFilms = new ArrayList<>();
         for (String href : getFilmHrefs(day)) {//Идем по списку со всеми ссылками на фильмы в этот день
@@ -105,39 +113,44 @@ public class Scraper {
     }
 
     public List<Film> getDay1Films() {
-        return getFilms(week.getDay(0));
+        return getFilms(Week.getDay(0));
     }
 
     public List<Film> getDay2Films() {
-        return getFilms(week.getDay(1));
+        return getFilms(Week.getDay(1));
     }
 
     public List<Film> getDay3Films() {
-        return getFilms(week.getDay(2));
+        return getFilms(Week.getDay(2));
     }
 
     public List<Film> getDay4Films() {
-        return getFilms(week.getDay(3));
+        return getFilms(Week.getDay(3));
     }
 
     public List<Film> getDay5Films() {
-        return getFilms(week.getDay(4));
+        return getFilms(Week.getDay(4));
     }
 
     public List<Film> getDay6Films() {
-        return getFilms(week.getDay(5));
+        return getFilms(Week.getDay(5));
     }
 
     public List<Film> getDay7Films() {
-        return getFilms(week.getDay(6));
+        return getFilms(Week.getDay(6));
     }
 
     public List<List<Film>> getWeekFilms() {
         List<List<Film>> weekFilms = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            weekFilms.add(getFilms(week.getDay(0)));
+        for (int i = 0; i < Week.size(); i++) {
+            weekFilms.add(getFilms(Week.getDay(0)));
         }
         return weekFilms;
+    }
+
+    public List<Film> getBufferedFilms() {
+        previousDaysFilms.forEach((film) -> film.setSessionList(null));//ставим null в сеансы т.к. они не валидны
+        return previousDaysFilms;
     }
 
     public void close() {

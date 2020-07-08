@@ -7,7 +7,8 @@ import java.util.Calendar;
 
 @Component
 public class Week {
-    private final String[] days = new String[7];
+    private static final int size = 7;
+    private static final String[] days = new String[7];
 
     public Week() {
         Calendar calendar = Calendar.getInstance();
@@ -18,7 +19,7 @@ public class Week {
         }
     }
 
-    public String getDay(int i) {
+    public static String getDay(int i) {
         try {
             return days[i];
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -27,7 +28,11 @@ public class Week {
         }
     }
 
-    public String[] getDays() {
+    public static String[] getDays() {
         return days;
+    }
+
+    public static int size() {
+        return size;
     }
 }
