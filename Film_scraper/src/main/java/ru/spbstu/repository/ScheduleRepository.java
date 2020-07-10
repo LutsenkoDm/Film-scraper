@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface ScheduleRepository extends CrudRepository<Schedule, Long> {
-    Optional<Schedule> findByFilm(Film film);
+    
 }
