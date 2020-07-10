@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -31,7 +33,9 @@ public class Film {
 
   private String actors;
 
-  public Film(String title, Integer year, String country, String director, String genre, String duration, String actors) {
+  private double rating;
+
+  public Film(String title, Integer year, String country, String director, String genre, String duration, String actors, double rating) {
     this.title = title;
     this.year = year;
     this.country = country;
@@ -39,5 +43,6 @@ public class Film {
     this.genre = genre;
     this.duration = duration;
     this.actors = actors;
+    this.rating = rating;
   }
 }

@@ -19,6 +19,7 @@ public class Session {
   @Column(name = "id")
   private Integer id;
 
+  @Column(unique = true)
   private LocalDateTime dateTime;
 
   private Integer cost;
