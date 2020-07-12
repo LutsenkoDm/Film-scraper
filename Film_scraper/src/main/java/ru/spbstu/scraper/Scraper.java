@@ -31,7 +31,7 @@ public class Scraper {
     private static final List<Film> previousDaysFilms = new ArrayList<>();
 
     static {
-        System.setProperty("webdriver.gecko.driver", "drivers\\geckodriver.exe");
+        System.setProperty("webdriver.gecko.driver", "Film_scraper\\drivers\\geckodriver.exe");
         url = "https://www.kinopoisk.ru/";
         cityUrl = "afisha/city/2/";
         Proxy proxy = new Proxy();
