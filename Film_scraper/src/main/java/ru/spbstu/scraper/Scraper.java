@@ -10,7 +10,6 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +39,9 @@ public class Scraper {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(CapabilityType.PROXY, proxy);
         driver = new FirefoxDriver(new FirefoxOptions(capabilities));
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+
+
     }
 
     private List<String> getFilmHrefs(String day) {//Получаем список со всеми ссылками на фильмы
@@ -78,8 +79,8 @@ public class Scraper {
         List<Film> thisDayFilms = new ArrayList<>();
         for (String href : getFilmHrefs(day)) {//Идем по списку со всеми ссылками на фильмы в этот день
             driver.get(href);//Переходим на страницу с фильмом
-            String filmName = driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[1]/div[1]/div/h1/span")).getText();//Получаем названия фильма
-            Optional<Film> previousDayFilm = previousDaysFilms.stream().filter(s -> s.getName().contains(filmName)).findAny();//Ищем такой фильм в уже просмотренных нами
+            String filmTitle = driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[1]/div[1]/div/h1/span")).getText();//Получаем названия фильма
+            Optional<Film> previousDayFilm = previousDaysFilms.stream().filter(s -> s.getTitle().contains(filmTitle)).findAny();//Ищем такой фильм в уже просмотренных нами
             if (previousDayFilm.isPresent()) {//Если такой был в предыдущие дни
                 previousDayFilm.get().setSessionList(getFilmSessionList(href));//То меняем только сеансы
                 thisDayFilms.add(previousDayFilm.get());//Добавляем его в список фильмов в данный день
@@ -112,7 +113,7 @@ public class Scraper {
                             break;
                     }
                 }
-                Film newFilm = new Film(filmName,year,country,director,genre,duration, actors, rating, getFilmSessionList(href));
+                Film newFilm = new Film(filmTitle,year,country,director,genre,duration, actors, rating, getFilmSessionList(href));
                 thisDayFilms.add(newFilm);//Добавляем фильм в список фильмов в данный день
                 previousDaysFilms.add(newFilm);//И его же в список уже просмотренных, т.к. мы его встретили первый раз
             }

@@ -6,16 +6,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.spbstu.entity.Film;
+import ru.spbstu.entity.Schedule;
 import ru.spbstu.exeption.FilmNotFoundExeption;
 import ru.spbstu.service.FilmService;
+import ru.spbstu.service.ScheduleService;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/database")
 public class FilmController {
     @Autowired
-    private FilmService filmService;
+    private final FilmService filmService;
 
     public FilmController(FilmService filmService) {
         this.filmService = filmService;

@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/database")
 public class HistoryController {
     @Autowired
-    private HistoryService historyService;
+    private final HistoryService historyService;
 
     public HistoryController(HistoryService historyService){
         this.historyService = historyService;

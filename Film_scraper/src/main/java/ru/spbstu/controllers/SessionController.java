@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/database")
 public class SessionController {
     @Autowired
-    private SessionService sessionService;
+    private final SessionService sessionService;
 
     public SessionController(SessionService sessionService) {
         this.sessionService = sessionService;

@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/database")
 public class CinemaController {
     @Autowired
-    private CinemaService cinemaService;
+    private final CinemaService cinemaService;
 
     public CinemaController(CinemaService cinemaService){
         this.cinemaService = cinemaService;

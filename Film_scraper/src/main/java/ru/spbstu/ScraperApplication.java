@@ -11,10 +11,8 @@ import ru.spbstu.entity.Session;
 import ru.spbstu.repository.*;
 import ru.spbstu.scraper.Scraper;
 import ru.spbstu.scraper.Week;
-import java.sql.Timestamp;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Optional;
 
 @SpringBootApplication
@@ -48,11 +46,11 @@ public class ScraperApplication {
     for (int i = 0; i < Week.size(); i++) {
       String day = Week.getDay(i);
       scraper.getFilms(day).forEach((scrapedFilm) -> {
-        Optional<Film> filmOptional = filmRepository.findByTitle(scrapedFilm.getName());
+        Optional<Film> filmOptional = filmRepository.findByTitle(scrapedFilm.getTitle());
         if (filmOptional.isPresent()) {
           film = filmOptional.get();
         } else {
-          film = new Film(scrapedFilm.getName(), Integer.parseInt(scrapedFilm.getYear()), scrapedFilm.getCountry(), scrapedFilm.getDirector(),
+          film = new Film(scrapedFilm.getTitle(), Integer.parseInt(scrapedFilm.getYear()), scrapedFilm.getCountry(), scrapedFilm.getDirector(),
                                scrapedFilm.getGenre(), scrapedFilm.getDuration(), scrapedFilm.getActors(), scrapedFilm.getRating());
           filmRepository.save(film);
         }
