@@ -1,4 +1,4 @@
-package ru.spbstu.scraper;
+﻿package ru.spbstu.scraper;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Proxy;
@@ -6,6 +6,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-
 
 @Component
 public class Scraper {
@@ -31,7 +31,7 @@ public class Scraper {
     private static final List<Film> previousDaysFilms = new ArrayList<>();
 
     static {
-        System.setProperty("webdriver.gecko.driver", "Film_scraper\\drivers\\geckodriver.exe");
+        System.setProperty("webdriver.gecko.driver", "drivers\\geckodriver.exe");
         url = "https://www.kinopoisk.ru/";
         cityUrl = "afisha/city/2/";
         Proxy proxy = new Proxy();
@@ -40,8 +40,8 @@ public class Scraper {
         capabilities.setCapability(CapabilityType.PROXY, proxy);
         driver = new FirefoxDriver(new FirefoxOptions(capabilities));
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-
-
+        FirefoxProfile profile = new FirefoxProfile();
+        profile.setPreference("general.useragent.override", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.4083.0 Safari/537.36");
     }
 
     private List<String> getFilmHrefs(String day) {//Получаем список со всеми ссылками на фильмы
