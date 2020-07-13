@@ -11,7 +11,9 @@ import ru.spbstu.repository.ScheduleRepository;
 import ru.spbstu.service.ScheduleService;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,8 +93,8 @@ public class ScheduleController {
     }
 
     @GetMapping("/filmSessionsById/{id}")//Все сеансы определенного фильма за всю неделю по ID
-    public ResponseEntity<List<Schedule>> getFilmWeekSessionsById(@PathVariable("id") long id) {
-        List<Schedule> filmWeekSessions = scheduleService.listSchedule().stream().filter(schedule -> schedule.getFilm().getId() == id).collect(Collectors.toList());
+    public ResponseEntity<List<Session>> getFilmWeekSessionsById(@PathVariable("id") long id) {
+        List<Session> filmWeekSessions = scheduleService.listSchedule().stream().filter(schedule -> schedule.getFilm().getId() == id).map(Schedule::getSession).collect(Collectors.toList());
         if (filmWeekSessions.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found");
         }
@@ -100,21 +102,12 @@ public class ScheduleController {
     }
 
     @GetMapping("/filmSessionsByTitle/{title}")//Все сеансы определенного фильма за всю неделю по title
-    public ResponseEntity<List<Schedule>> getFilmWeekSessionsByTitle(@PathVariable("title") String title) {
-        List<Schedule> filmWeekSessions = scheduleService.listSchedule().stream().filter(schedule -> schedule.getFilm().getTitle().equals(title)).collect(Collectors.toList());
+    public ResponseEntity<List<Session>> getFilmWeekScheduleByTitle(@PathVariable("title") String title) {
+        List<Session> filmWeekSessions = scheduleService.listSchedule().stream().filter(schedule -> schedule.getFilm().getTitle().equals(title)).map(Schedule::getSession).collect(Collectors.toList());
         if (filmWeekSessions.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found");
         }
         return new ResponseEntity<>(filmWeekSessions, HttpStatus.OK);
-    }
-
-    @GetMapping("/films/{year1}/{year2}")//Фильтр по годам
-    public ResponseEntity<List<Schedule>> filterFilmsByYear(@PathVariable("year1") int year1, @PathVariable("year2") int year2) {
-        List<Schedule> filteredByYearFilms = scheduleService.listSchedule().stream().filter(schedule -> schedule.getFilm().getYear()  >= year1 && schedule.getFilm().getYear() <= year2).collect(Collectors.toList());
-        if (filteredByYearFilms.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Films not found");
-        }
-        return new ResponseEntity<>(filteredByYearFilms, HttpStatus.OK);
     }
 }
 

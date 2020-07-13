@@ -45,4 +45,8 @@ public class Film {
     this.actors = actors;
     this.rating = rating;
   }
+
+  public int getDurationInMinutes () throws NumberFormatException {
+    return Integer.parseInt(duration.split(" ")[0]);
+  }
 }
