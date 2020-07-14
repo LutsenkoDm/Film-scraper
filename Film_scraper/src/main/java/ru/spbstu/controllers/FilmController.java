@@ -132,4 +132,74 @@ public class FilmController {
         return new ResponseEntity<>(listBySort.subList(0, 4), HttpStatus.OK);
     }
 
+    @GetMapping("/getImage1/{id}") //Возвращает ссылку на картинку 1 фильма по id
+    public ResponseEntity<String> getImage1 (@PathVariable("id") long id) {
+        try {
+            return new ResponseEntity<>(filmService.findFilm(id).getImageRef1(), HttpStatus.OK);
+        } catch (FilmNotFoundExeption e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found.");
+        }
+    }
+
+    @GetMapping("/getImage2/{id}") //Возвращает ссылку на картинку 2 фильма по id
+    public ResponseEntity<String> getImage2 (@PathVariable("id") long id) {
+        try {
+            return new ResponseEntity<>(filmService.findFilm(id).getImageRef2(), HttpStatus.OK);
+        } catch (FilmNotFoundExeption e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found.");
+        }
+    }
+
+    @GetMapping("/getImage3/{id}") //Возвращает ссылку на картинку 3 фильма по id
+    public ResponseEntity<String> getImage3 (@PathVariable("id") long id) {
+        try {
+            return new ResponseEntity<>(filmService.findFilm(id).getImageRef3(), HttpStatus.OK);
+        } catch (FilmNotFoundExeption e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found.");
+        }
+    }
+
+    @GetMapping("/getImage4/{id}") //Возвращает ссылку на картинку 4 фильма по id
+    public ResponseEntity<String> getImage4 (@PathVariable("id") long id) {
+        try {
+            return new ResponseEntity<>(filmService.findFilm(id).getImageRef4(), HttpStatus.OK);
+        } catch (FilmNotFoundExeption e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found.");
+        }
+    }
+
+    @GetMapping("/getImage1ByTitle/{title}") //Возвращает ссылку на картинку 1 фильма по title
+    public ResponseEntity<String> getImage1ByTitle (@PathVariable("title") String title) {
+        try {
+            return new ResponseEntity<>(filmService.findFilm(title).getImageRef1(), HttpStatus.OK);
+        } catch (FilmNotFoundExeption e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found.");
+        }
+    }
+
+    @GetMapping("/getImage2ByTitle/{title}") //Возвращает ссылку на картинку 2 фильма по title
+    public ResponseEntity<String> getImage2ByTitle (@PathVariable("title") String title) {
+        try {
+            return new ResponseEntity<>(filmService.findFilm(title).getImageRef2(), HttpStatus.OK);
+        } catch (FilmNotFoundExeption e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found.");
+        }
+    }
+    @GetMapping("/getImage3ByTitle/{title}") //Возвращает ссылку на картинку 3 фильма по title
+    public ResponseEntity<String> getImage3ByTitle (@PathVariable("title") String title) {
+        try {
+            return new ResponseEntity<>(filmService.findFilm(title).getImageRef3(), HttpStatus.OK);
+        } catch (FilmNotFoundExeption e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found.");
+        }
+    }
+
+    @GetMapping("/getImage4ByTitle/{title}") //Возвращает ссылку на картинку 4 фильма по title
+    public ResponseEntity<String> getImage4ByTitle (@PathVariable("title") String title) {
+        try {
+            return new ResponseEntity<>(filmService.findFilm(title).getImageRef4(), HttpStatus.OK);
+        } catch (FilmNotFoundExeption e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found.");
+        }
+    }
 }
