@@ -1,4 +1,4 @@
-﻿package ru.spbstu.scraper;
+package ru.spbstu.scraper;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Proxy;
@@ -46,14 +46,14 @@ public class Scraper {
         profile.setPreference("general.useragent.override", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.4083.0 Safari/537.36");
     }
 
-    private List<String> getFilmHrefs(String day) {//Получаем список со всеми ссылками на фильмы
+    private List<String> getFilmHrefs(String day) {//???????? ?????? ?? ????? ???????? ?? ??????
         List<String> filmHrefs = new ArrayList<>();
         List<WebElement> filmWebElements = driver.findElements(By.xpath("//div[@class=\"title _FILM_\"]/div/p"));
         for (WebElement film : filmWebElements) {
-            if (film.findElement(By.tagName("u")).getAttribute("id").contains(day)) {//Если фильм идет в этот день
-                filmHrefs.add(film.findElement(By.tagName("a")).getAttribute("href"));//То добавлеем ссылку на него
+            if (film.findElement(By.tagName("u")).getAttribute("id").contains(day)) {//???? ????? ???? ? ???? ????
+                filmHrefs.add(film.findElement(By.tagName("a")).getAttribute("href"));//?? ????????? ?????? ?? ????
             } else {
-                break;//Сначала всегда идут фильмы в этот день, после них нас уже не интересуют
+                break;//??????? ?????? ???? ?????? ? ???? ????, ????? ??? ??? ??? ?? ??????????
             }
         }
         return filmHrefs;
@@ -61,14 +61,14 @@ public class Scraper {
 
     private List<Session> getFilmSessionList(String filmHref) {
         List<Session> sessionList = new ArrayList<>();
-        driver.get(filmHref + cityUrl);//Жмем кнопку переводящую нас на страницу с сеансами данного фильма
-        List<WebElement> schedulerItems = driver.findElements(By.xpath("//*[@class=\"schedule-item\"]"));//Получаем элемент с названием кнотеатра и временем в нем
+        driver.get(filmHref + cityUrl);//???? ?????? ??????????? ??? ?? ???????? ? ???????? ??????? ??????
+        List<WebElement> schedulerItems = driver.findElements(By.xpath("//*[@class=\"schedule-item\"]"));//???????? ??????? ? ????????? ????????? ? ???????? ? ???
         for (WebElement item : schedulerItems) {
-            String cinemaName = item.findElement(By.xpath(".//*[@class=\"schedule-item__left\"]//a")).getText();//Получаем название кинотеатра
-            //Получаем список времен сеансов в кинотеатре
+            String cinemaName = item.findElement(By.xpath(".//*[@class=\"schedule-item__left\"]//a")).getText();//???????? ???????? ??????????
+            //???????? ?????? ?????? ??????? ? ??????????
             List<WebElement> sessionTimes = item.findElements(By.xpath(".//*[@class=\"schedule-item__right\"]//*[@class=\"schedule-item__session-button\"]"));
             List<String> sessionTimesInString = new ArrayList<>();
-            for (WebElement sessionTime : sessionTimes) {//Переобразуем их в String
+            for (WebElement sessionTime : sessionTimes) {//???????????? ?? ? String
                 sessionTimesInString.add(sessionTime.getText());
             }
             sessionList.add(new Session(cinemaName, sessionTimesInString));
@@ -79,15 +79,15 @@ public class Scraper {
     public List<Film> getFilms(String day) {
         driver.get(url + cityUrl + "day_view/" + day);
         List<Film> thisDayFilms = new ArrayList<>();
-        for (String href : getFilmHrefs(day)) {//Идем по списку со всеми ссылками на фильмы в этот день
-            driver.get(href);//Переходим на страницу с фильмом
-            String filmTitle = driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[1]/div[1]/div/h1/span")).getText();//Получаем названия фильма
-            Optional<Film> previousDayFilm = previousDaysFilms.stream().filter(s -> s.getTitle().contains(filmTitle)).findAny();//Ищем такой фильм в уже просмотренных нами
-            if (previousDayFilm.isPresent()) {//Если такой был в предыдущие дни
-                previousDayFilm.get().setSessionList(getFilmSessionList(href));//То меняем только сеансы
-                thisDayFilms.add(previousDayFilm.get());//Добавляем его в список фильмов в данный день
-            } else {//Если в преыдущие дни такого фильма не было
-                actors = driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[2]/div[2]/div/div[1]/ul")).getText();//Скрапим актеров
+        for (String href : getFilmHrefs(day)) {//???? ?? ?????? ?? ????? ???????? ?? ?????? ? ???? ????
+            driver.get(href);//????????? ?? ???????? ? ???????
+            String filmTitle = driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[1]/div[1]/div/h1/span")).getText();//???????? ???????? ??????
+            Optional<Film> previousDayFilm = previousDaysFilms.stream().filter(s -> s.getTitle().contains(filmTitle)).findAny();//???? ????? ????? ? ??? ????????????? ????
+            if (previousDayFilm.isPresent()) {//???? ????? ??? ? ?????????? ???
+                previousDayFilm.get().setSessionList(getFilmSessionList(href));//?? ?????? ?????? ??????
+                thisDayFilms.add(previousDayFilm.get());//????????? ??? ? ?????? ??????? ? ?????? ????
+            } else {//???? ? ????????? ??? ?????? ?????? ?? ????
+                actors = driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[2]/div[2]/div/div[1]/ul")).getText();//??????? ???????
                 actors = actors.substring(0, actors.indexOf('\n', actors.indexOf('\n', actors.indexOf('\n', actors.indexOf('\n') + 1) + 1) + 1));
                 description = driver.findElement(By.className("styles_paragraph__2Otvx")).getText();
                 description = description.length() > 252 ? description.substring(0, 252) + "..." : description;
@@ -97,30 +97,30 @@ public class Scraper {
                     rating = 0.0;
                     exception.printStackTrace();
                 }
-                List<WebElement> filmInfoTableRows = driver.findElements(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[2]/div[1]/div/div"));//Скрапим табличку с инфой о фильме
+                List<WebElement> filmInfoTableRows = driver.findElements(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[2]/div[1]/div/div"));//??????? ???????? ? ????? ? ??????
                 By rowValueXpath = By.xpath("./div[2]");
-                for (WebElement row : filmInfoTableRows) {//Бежим по ней и ищем интересующие нас характеристики
-                      switch (row.findElement(By.xpath("./div[1]")).getText()/*Имя ряда*/) {
-                        case "Год производства":
+                for (WebElement row : filmInfoTableRows) {//????? ?? ??? ? ???? ???????????? ??? ??????????????
+                      switch (row.findElement(By.xpath("./div[1]")).getText()/*??? ????*/) {
+                        case "??? ????????????":
                             year = row.findElement(rowValueXpath).getText();
                             break;
-                        case "Страна":
+                        case "??????":
                             country = row.findElement(rowValueXpath).getText();
                             break;
-                        case "Режиссер":
+                        case "????????":
                             director = row.findElement(rowValueXpath).getText();
                             break;
-                        case "Жанр":
-                            genre = row.findElement(rowValueXpath).getText().replace(", ..." + '\n' + "слова", "");
+                        case "????":
+                            genre = row.findElement(rowValueXpath).getText().replace(", ..." + '\n' + "?????", "");
                             break;
-                        case "Время":
+                        case "?????":
                             duration = row.findElement(rowValueXpath).getText();
                             break;
                     }
                 }
                 Film newFilm = new Film(filmTitle,year,country,director,genre,duration, actors, description, rating, getFilmSessionList(href));
-                thisDayFilms.add(newFilm);//Добавляем фильм в список фильмов в данный день
-                previousDaysFilms.add(newFilm);//И его же в список уже просмотренных, т.к. мы его встретили первый раз
+                thisDayFilms.add(newFilm);//????????? ????? ? ?????? ??????? ? ?????? ????
+                previousDaysFilms.add(newFilm);//? ??? ?? ? ?????? ??? ?????????????, ?.?. ?? ??? ????????? ?????? ???
             }
         }
         return thisDayFilms;
@@ -163,7 +163,7 @@ public class Scraper {
     }
 
     public List<Film> getBufferedFilms() {
-        previousDaysFilms.forEach((film) -> film.setSessionList(null));//ставим null в сеансы т.к. они не валидны
+        previousDaysFilms.forEach((film) -> film.setSessionList(null));//?????? null ? ?????? ?.?. ??? ?? ???????
         return previousDaysFilms;
     }
 

@@ -13,6 +13,8 @@ import ru.spbstu.service.FilmService;
 import ru.spbstu.service.ScheduleService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -116,5 +118,18 @@ public class FilmController {
         }
     }
 
+    @GetMapping("/filterFilmsByBestRating")//Сортировка фильмов по убыванию рейтинга.
+    public ResponseEntity<List<Film>> filterFilmsByBestRating() {
+        List<Film> listBySort = new ArrayList<>(filmService.listFilm());
+        listBySort.sort(Comparator.comparingDouble(Film::getRating).reversed());
+        return new ResponseEntity<>(listBySort.subList(0, 4), HttpStatus.OK);
+    }
+
+    @GetMapping("/filterFilmsByYears")//Сортировка фильмов по убыванию года выпуска.
+    public ResponseEntity<List<Film>> filterFilmsByYears() {
+        List<Film> listBySort = new ArrayList<>(filmService.listFilm());
+        listBySort.sort(Comparator.comparingInt(Film::getYear).reversed());
+        return new ResponseEntity<>(listBySort.subList(0, 4), HttpStatus.OK);
+    }
 
 }
