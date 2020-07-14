@@ -15,6 +15,7 @@ public class Film {
     private String genre;
     private String duration;
     private String actors;
+    private String description;
     private double rating;
     private List<Session> sessionList;
 }

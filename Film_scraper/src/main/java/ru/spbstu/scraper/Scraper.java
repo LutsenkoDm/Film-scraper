@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+
 @Component
 public class Scraper {
 
@@ -27,6 +28,7 @@ public class Scraper {
     private static String genre;
     private static String duration;
     private static String actors;
+    private static String description;
     private static double rating;
     private static final List<Film> previousDaysFilms = new ArrayList<>();
 
@@ -86,6 +88,9 @@ public class Scraper {
                 thisDayFilms.add(previousDayFilm.get());//Добавляем его в список фильмов в данный день
             } else {//Если в преыдущие дни такого фильма не было
                 actors = driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[2]/div[2]/div/div[1]/ul")).getText();//Скрапим актеров
+                actors = actors.substring(0, actors.indexOf('\n', actors.indexOf('\n', actors.indexOf('\n', actors.indexOf('\n') + 1) + 1) + 1));
+                description = driver.findElement(By.className("styles_paragraph__2Otvx")).getText();
+                description = description.length() > 252 ? description.substring(0, 252) + "..." : description;
                 try {
                     rating = Double.parseDouble(driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[1]/div[2]/div/div[1]/span[1]/span")).getText());
                 } catch (NumberFormatException exception) {
@@ -113,7 +118,7 @@ public class Scraper {
                             break;
                     }
                 }
-                Film newFilm = new Film(filmTitle,year,country,director,genre,duration, actors, rating, getFilmSessionList(href));
+                Film newFilm = new Film(filmTitle,year,country,director,genre,duration, actors, description, rating, getFilmSessionList(href));
                 thisDayFilms.add(newFilm);//Добавляем фильм в список фильмов в данный день
                 previousDaysFilms.add(newFilm);//И его же в список уже просмотренных, т.к. мы его встретили первый раз
             }
