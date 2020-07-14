@@ -29,6 +29,7 @@ public class Scraper {
     private static String duration;
     private static String actors;
     private static String description;
+    private static final String[] imageRefs = new String[4];
     private static double rating;
     private static final List<Film> previousDaysFilms = new ArrayList<>();
 
@@ -40,7 +41,9 @@ public class Scraper {
         proxy.setHttpProxy("localhost:8888");
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(CapabilityType.PROXY, proxy);
-        driver = new FirefoxDriver(new FirefoxOptions(capabilities));
+        FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
+        firefoxOptions.addArguments("--headless");
+        driver = new FirefoxDriver(firefoxOptions);
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         FirefoxProfile profile = new FirefoxProfile();
         profile.setPreference("general.useragent.override", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.4083.0 Safari/537.36");
@@ -89,7 +92,8 @@ public class Scraper {
             } else {//Если в преыдущие дни такого фильма не было
                 actors = driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[2]/div[2]/div/div[1]/ul")).getText();//Скрапим актеров
                 actors = actors.substring(0, actors.indexOf('\n', actors.indexOf('\n', actors.indexOf('\n', actors.indexOf('\n') + 1) + 1) + 1));
-                description = driver.findElement(By.className("styles_paragraph__2Otvx")).getText();
+                List<WebElement> descriptionOptional = driver.findElements(By.className("styles_paragraph__2Otvx"));
+                description = descriptionOptional.isEmpty() ? "-" : descriptionOptional.get(0).getText();
                 description = description.length() > 252 ? description.substring(0, 252) + "..." : description;
                 try {
                     rating = Double.parseDouble(driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[1]/div[2]/div/div[1]/span[1]/span")).getText());
@@ -118,7 +122,13 @@ public class Scraper {
                             break;
                     }
                 }
-                Film newFilm = new Film(filmTitle,year,country,director,genre,duration, actors, description, rating, getFilmSessionList(href));
+                imageRefs[0] = driver.findElement(By.xpath("//*[@class=\"styles_root__3uUGx\"]/img")).getAttribute("src");
+                driver.get(href + "images");
+                List<WebElement> filmImages = driver.findElements(By.xpath("//table[@class=\"js-rum-hero fotos\"]/tbody/tr[1]//td/a/img"));
+                for (int i = 0; i < filmImages.size(); i++) {
+                    imageRefs[i + 1] = filmImages.get(i).getAttribute("src");
+                }
+                Film newFilm = new Film(filmTitle,year,country,director,genre,duration, actors, description, imageRefs, rating, getFilmSessionList(href));
                 thisDayFilms.add(newFilm);//Добавляем фильм в список фильмов в данный день
                 previousDaysFilms.add(newFilm);//И его же в список уже просмотренных, т.к. мы его встретили первый раз
             }
@@ -160,11 +170,6 @@ public class Scraper {
             weekFilms.add(getFilms(Week.getDay(0)));
         }
         return weekFilms;
-    }
-
-    public List<Film> getBufferedFilms() {
-        previousDaysFilms.forEach((film) -> film.setSessionList(null));//ставим null в сеансы т.к. они не валидны
-        return previousDaysFilms;
     }
 
     public void close() {

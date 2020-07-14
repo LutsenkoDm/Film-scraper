@@ -16,6 +16,7 @@ public class Film {
     private String duration;
     private String actors;
     private String description;
+    private String[] imageRefs;
     private double rating;
     private List<Session> sessionList;
 }
