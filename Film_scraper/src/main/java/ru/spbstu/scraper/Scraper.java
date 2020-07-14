@@ -1,4 +1,4 @@
-﻿package ru.spbstu.scraper;
+package ru.spbstu.scraper;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Proxy;
