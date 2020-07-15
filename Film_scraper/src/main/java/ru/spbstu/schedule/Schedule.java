@@ -10,7 +10,6 @@ import ru.spbstu.notification.EmailService;
 public class Schedule {
 
   private final EmailService emailService;
-
   @Scheduled(fixedRate = 86400000)
   public void notifyUsers() {
     emailService.notifyAllUsers();

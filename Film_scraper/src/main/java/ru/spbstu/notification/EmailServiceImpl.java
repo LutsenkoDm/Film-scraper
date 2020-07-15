@@ -1,7 +1,6 @@
 package ru.spbstu.notification;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.spbstu.entity.Film;
 import ru.spbstu.entity.Schedule;
