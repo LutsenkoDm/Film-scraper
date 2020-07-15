@@ -3,8 +3,6 @@ package ru.spbstu.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -17,7 +15,7 @@ public class Session {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "id")
-  private Integer id;
+  private Long id;
 
   @Column(unique = true)
   private LocalDateTime dateTime;

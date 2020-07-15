@@ -1,82 +1,105 @@
 package ru.spbstu.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.ArrayList;
+import javax.validation.constraints.Size;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-@Data
-@NoArgsConstructor
 @Entity
 @Table(name = "usr")
 public class User implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @Size(min=2, message = "Не меньше 5 знаков")
+    private String username;
+    @Size(min=2, message = "Не меньше 5 знаков")
+    private String password;
+    @Transient
+    private String passwordConfirm;
+    @Size(min=2, message = "Не меньше 5 знаков")
+    private String email;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Role> roles;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "id")
-  private Integer id;
+    public User() {
+    }
 
-  @Column(unique = true)
-  private String user_name;
+    public Long getId() {
+        return id;
+    }
 
-  private String password;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  private String email;
+    @Override
+    public String getUsername() {
+        return username;
+    }
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  private List<String> roles = new ArrayList<>();
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-  public User(String user_name, String password, String email, List<String> roles) {
-    this.user_name = user_name;
-    this.password = password;
-    this.email = email;
-    this.roles = roles;
-  }
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-  public List<String> getRoles() {
-    return roles;
-  }
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-  }
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 
-  @Override
-  public String getUsername() {
-    return user_name;
-  }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getRoles();
+    }
 
-  @Override
-  public String getPassword() {
-    return password;
-  }
+    @Override
+    public String getPassword() {
+        return password;
+    }
 
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
+    public String getPasswordConfirm() {
+        return passwordConfirm;
+    }
 
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
+    }
 
-  @Override
-  public boolean isEnabled() {
-    return true;
-  }
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }
