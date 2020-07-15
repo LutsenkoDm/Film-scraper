@@ -16,7 +16,7 @@ public class History {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "id", nullable = false)
-  private Integer id;
+  private Long id;
 
   @ManyToOne
   @OnDelete(action = OnDeleteAction.CASCADE)

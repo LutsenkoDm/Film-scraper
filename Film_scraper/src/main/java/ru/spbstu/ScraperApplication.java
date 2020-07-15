@@ -51,7 +51,8 @@ public class ScraperApplication {
           film = filmOptional.get();
         } else {
           film = new Film(scrapedFilm.getTitle(), Integer.parseInt(scrapedFilm.getYear()), scrapedFilm.getCountry(), scrapedFilm.getDirector(),
-                               scrapedFilm.getGenre(), scrapedFilm.getDuration(), scrapedFilm.getActors(), scrapedFilm.getRating());
+                          scrapedFilm.getGenre(), scrapedFilm.getDuration(), scrapedFilm.getActors(), scrapedFilm.getDescription(),
+                          scrapedFilm.getImageRefs()[0], scrapedFilm.getImageRefs()[1],  scrapedFilm.getImageRefs()[2] , scrapedFilm.getImageRefs()[3], scrapedFilm.getRating());
           filmRepository.save(film);
         }
         for (var scrapedSession : scrapedFilm.getSessionList()) {

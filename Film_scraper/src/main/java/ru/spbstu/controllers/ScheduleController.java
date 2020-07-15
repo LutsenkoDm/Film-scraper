@@ -11,7 +11,9 @@ import ru.spbstu.repository.ScheduleRepository;
 import ru.spbstu.service.ScheduleService;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,8 +93,8 @@ public class ScheduleController {
     }
 
     @GetMapping("/filmSessionsById/{id}")//Все сеансы определенного фильма за всю неделю по ID
-    public ResponseEntity<List<Schedule>> getFilmWeekSessionsById(@PathVariable("id") long id) {
-        List<Schedule> filmWeekSessions = scheduleService.listSchedule().stream().filter(schedule -> schedule.getFilm().getId() == id).collect(Collectors.toList());
+    public ResponseEntity<List<Session>> getFilmWeekSessionsById(@PathVariable("id") long id) {
+        List<Session> filmWeekSessions = scheduleService.listSchedule().stream().filter(schedule -> schedule.getFilm().getId() == id).map(Schedule::getSession).collect(Collectors.toList());
         if (filmWeekSessions.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found");
         }
@@ -100,21 +102,54 @@ public class ScheduleController {
     }
 
     @GetMapping("/filmSessionsByTitle/{title}")//Все сеансы определенного фильма за всю неделю по title
-    public ResponseEntity<List<Schedule>> getFilmWeekSessionsByTitle(@PathVariable("title") String title) {
-        List<Schedule> filmWeekSessions = scheduleService.listSchedule().stream().filter(schedule -> schedule.getFilm().getTitle().equals(title)).collect(Collectors.toList());
+    public ResponseEntity<List<Session>> getFilmWeekScheduleByTitle(@PathVariable("title") String title) {
+        List<Session> filmWeekSessions = scheduleService.listSchedule().stream().filter(schedule -> schedule.getFilm().getTitle().equals(title)).map(Schedule::getSession).collect(Collectors.toList());
         if (filmWeekSessions.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Film not found");
         }
         return new ResponseEntity<>(filmWeekSessions, HttpStatus.OK);
     }
 
-    @GetMapping("/films/{year1}/{year2}")//Фильтр по годам
-    public ResponseEntity<List<Schedule>> filterFilmsByYear(@PathVariable("year1") int year1, @PathVariable("year2") int year2) {
-        List<Schedule> filteredByYearFilms = scheduleService.listSchedule().stream().filter(schedule -> schedule.getFilm().getYear()  >= year1 && schedule.getFilm().getYear() <= year2).collect(Collectors.toList());
-        if (filteredByYearFilms.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Films not found");
+    @GetMapping("/cinemaScheduleById/{id}")//Расписание в данном кинотеатре (по его Id)
+    public ResponseEntity<List<Schedule>> getCinemaSchedule(@PathVariable("id") long id) {
+        List<Schedule> filmsInCinema = scheduleService.listSchedule().stream().filter(schedule -> schedule.getCinema().getId() == id).collect(Collectors.toList());
+        if (filmsInCinema.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessions & Films in this cinema not found");
         }
-        return new ResponseEntity<>(filteredByYearFilms, HttpStatus.OK);
+        return new ResponseEntity<>(filmsInCinema, HttpStatus.OK);
+    }
+
+    @GetMapping("/cinemaScheduleByName/{name}")//Расписание в данном кинотеатре (по его названию)
+    public ResponseEntity<List<Schedule>> getCinemaSchedule(@PathVariable("name") String name) {
+        List<Schedule> filmsInCinema = scheduleService.listSchedule().stream().filter(schedule -> schedule.getCinema().getName().equals(name)).collect(Collectors.toList());
+        if (filmsInCinema.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessions & Films in this cinema not found");
+        }
+        return new ResponseEntity<>(filmsInCinema, HttpStatus.OK);
+    }
+
+    @GetMapping("/filmsSession/{day}/{time1}/{time2}")//Фильмы с сеансами в определённый день и промежуток времени
+    public ResponseEntity<List<Schedule>> filterFilmsAtCurrentDayByTime(@PathVariable("day") String dayParse,
+                                                          @PathVariable("time1") String timeParse1,
+                                                          @PathVariable("time2") String timeParse2) {
+
+        try {
+            LocalTime time1 = LocalTime.parse(timeParse1);
+            LocalTime time2 = LocalTime.parse(timeParse2);
+            LocalDate day = LocalDate.parse(dayParse);
+            List<Schedule> schedules = scheduleService.listSchedule().stream().filter(schedule ->
+                    schedule.getSession().getDateTime().toLocalDate().equals(day)
+                            && schedule.getSession().getDateTime().toLocalTime().isAfter(time1)
+                            && schedule.getSession().getDateTime().toLocalTime().isBefore(time2)).collect(Collectors.toList());
+
+            if(schedules.isEmpty())
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found sessions in this time");
+            return new ResponseEntity<>(schedules, HttpStatus.OK);
+
+        } catch (DateTimeParseException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Invalid date format, correct day: yyyy-mm-dd, correct time: HH:mm:ss.zzz");
+        }
     }
 }
 

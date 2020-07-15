@@ -29,4 +29,14 @@ public class FilmServiceImpl implements FilmService {
             throw new FilmNotFoundExeption("Not found!");
         }
     }
+
+    @Override
+    public Film findFilm(String title) {
+        Optional<Film> optionalFilm = filmRepository.findByTitle(title);
+        if (optionalFilm.isPresent()) {
+            return optionalFilm.get();
+        } else {
+            throw new FilmNotFoundExeption("Not found!");
+        }
+    }
 }
