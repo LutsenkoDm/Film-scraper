@@ -1,4 +1,4 @@
-create function get_director(curruserid integer) RETURNS setof varchar
+create function get_director(curruserid bigint) RETURNS setof varchar
     language sql
 as
 $$
@@ -8,5 +8,5 @@ SELECT director FROM film where id IN
     );
 $$;
 
-alter function get_director(integer) owner to postgres;
+alter function get_director(bigint) owner to postgres;
 

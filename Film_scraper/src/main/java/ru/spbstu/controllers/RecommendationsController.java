@@ -1,7 +1,13 @@
 package ru.spbstu.controllers;
 
 import java.util.*;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import ru.spbstu.entity.Film;
+import ru.spbstu.entity.User;
+import ru.spbstu.repository.UserRepository;
 import ru.spbstu.service.FilmService;
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
@@ -15,17 +21,40 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/database")
 public class RecommendationsController {
-    //написать реализацию получения id текущего пользователя
-    private int currentUserId = 3;
+    private Long currentUserId;
 
     @Autowired
     private FilmService filmService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @PersistenceContext
     private EntityManager entityManager;
 
+    private void setCurrentUserId() throws Exception {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (null == auth) {
+            throw new Exception("");
+        }
+
+        Object obj = auth.getPrincipal();
+        String username = "";
+
+        if (obj instanceof UserDetails) {
+            username = ((UserDetails) obj).getUsername();
+        } else {
+            username = obj.toString();
+        }
+
+        User user = userRepository.findByUsername(username);
+        currentUserId = user.getId();
+    }
+
     @GetMapping("/recommendations")
-    public List<Film> getRecommendations() {
+    public List<Film> getRecommendations() throws Exception {
+        setCurrentUserId();
         List<Film> films = filmService.listFilm();
         List<String> genres = getInfoFromDB("get_genres");
         List<String> producers = getInfoFromDB("get_director");
@@ -54,10 +83,10 @@ public class RecommendationsController {
             }
         }
 
+        recommendations.removeAll(getHistory());
+
         films.sort(Comparator.comparingDouble(Film::getRating).reversed());
         recommendations.addAll(films);
-
-        recommendations.removeAll(getHistory());
 
         return new ArrayList<>(recommendations).subList(0,10);
     }
@@ -65,7 +94,7 @@ public class RecommendationsController {
     private List<String> getInfoFromDB(String StoredProcedureName){
         StoredProcedureQuery query = entityManager
                 .createStoredProcedureQuery(StoredProcedureName)
-                .registerStoredProcedureParameter("curruserid", int.class, ParameterMode.IN)
+                .registerStoredProcedureParameter("curruserid", long.class, ParameterMode.IN)
                 .setParameter("curruserid", currentUserId);
         query.execute();
 
@@ -105,7 +134,7 @@ public class RecommendationsController {
 
         StoredProcedureQuery query = entityManager
                 .createStoredProcedureQuery("get_history")
-                .registerStoredProcedureParameter("curruserid", int.class, ParameterMode.IN)
+                .registerStoredProcedureParameter("curruserid", long.class, ParameterMode.IN)
                 .setParameter("curruserid", currentUserId);
         query.execute();
 

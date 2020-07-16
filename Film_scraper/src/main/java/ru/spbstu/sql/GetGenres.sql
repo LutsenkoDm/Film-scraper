@@ -1,4 +1,4 @@
-create function get_genres(curruserid integer) RETURNS setof varchar
+create function get_genres(curruserid bigint) RETURNS setof varchar
     language sql
 as
 $$
@@ -8,5 +8,5 @@ SELECT genre FROM film where id IN
     );
 $$;
 
-alter function get_genres(integer) owner to postgres;
+alter function get_genres(bigint) owner to postgres;
 
