@@ -6,9 +6,12 @@ import ru.spbstu.entity.Film;
 import ru.spbstu.entity.Schedule;
 import ru.spbstu.entity.Session;
 import ru.spbstu.entity.User;
+import ru.spbstu.repository.FilmRepository;
 import ru.spbstu.repository.ScheduleRepository;
 import ru.spbstu.repository.SessionRepository;
 import ru.spbstu.repository.UserRepository;
+import ru.spbstu.service.ScheduleService;
+import ru.spbstu.service.SessionService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,55 +21,61 @@ import java.util.List;
 @Service
 public class EmailServiceImpl implements EmailService {
 
-  private final ScheduleRepository scheduleRepository;
-
-  private final SessionRepository sessionRepository;
-
   private final UserRepository userRepository;
 
   private final EmailNotification emailNotification;
 
+  private final FilmRepository filmRepository;
+
+  private final SessionService sessionService;
+
+  private final ScheduleService scheduleService;
+
   public void notifyAllUsers() {
-    LocalDateTime date = LocalDateTime.now();
+    LocalDateTime thisDay = LocalDateTime.now();
+    LocalDateTime dayPlusOne = thisDay.plusDays(1);
 
-    LocalDateTime endOfDate = date.plusDays(1);
-
-    List<Film> filmListThisDay = getNearFilms(date, endOfDate);
+    List<Film> filmListThisDay = getRecommendedFilms();
+    List<Session> sessionList = sessionService.findSessionByDates(thisDay, dayPlusOne);
+    List<Schedule> scheduleList = findSchedulesByFilmsAndSessions(filmListThisDay, sessionList);
 
     List<User> userList = userRepository.findAll();
 
     for (User user : userList) {
-      for (Film film: filmListThisDay) {
-        emailNotification.sendNotification(user, film, findSchedulesByFilm(film));
+      for (Film film : filmListThisDay) {
+        emailNotification.sendNotification(user, film, getScheduleByFilm(film, scheduleList));
       }
     }
   }
 
-  private List<Film> getNearFilms(LocalDateTime dateTime, LocalDateTime endOfDate) {
 
+  private List<Film> getRecommendedFilms() {
+    //TODO Заменить на получения фильмов из списка рекомендаций!
+    return filmRepository.findAll();
+  }
 
-    List<Session> sessionList = sessionRepository.findAllByDateTimeGreaterThanAndDateTimeBefore(dateTime, endOfDate);
-
-    List<Film> filmListThisDay = new ArrayList<>();
+  private List<Schedule> findSchedulesByFilmsAndSessions(List<Film> filmListThisDay, List<Session> sessionList) {
 
     List<Schedule> scheduleList = new ArrayList<>();
 
-    if (sessionList != null) {
+    for (Film film : filmListThisDay) {
       for (Session session : sessionList) {
-        scheduleList.addAll(scheduleRepository.findAllBySession(session));
+        scheduleList.addAll(scheduleService.findSchedulesByFilmAndSession(film, session));
       }
     }
+    return scheduleList;
+  }
+
+  private List<Schedule> getScheduleByFilm(Film film, List<Schedule> scheduleList) {
+
+    List<Schedule> scheduleListWithOneFilm = new ArrayList<>();
 
     for (Schedule schedule : scheduleList) {
-      if (!filmListThisDay.contains(schedule.getFilm())) {
-        filmListThisDay.add(schedule.getFilm());
+      if (schedule.getFilm().getTitle().equals(film.getTitle())) {
+        scheduleListWithOneFilm.add(schedule);
       }
     }
-
-    return filmListThisDay;
+    return scheduleListWithOneFilm;
   }
-
-  private List<Schedule> findSchedulesByFilm(Film film) {
-    return scheduleRepository.findAllByFilm(film);
-  }
+  
 }

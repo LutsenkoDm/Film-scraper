@@ -3,7 +3,9 @@ package ru.spbstu.service;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.spbstu.entity.Film;
 import ru.spbstu.entity.Schedule;
+import ru.spbstu.entity.Session;
 import ru.spbstu.exeption.ScheduleNotFoundExeption;
 import ru.spbstu.repository.ScheduleRepository;
 
@@ -46,5 +48,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public void deleteSchedule(long id) {
         scheduleRepository.delete(findSchedule(id));
+    }
+
+    @Override
+    public List<Schedule> findSchedulesByFilmAndSession(Film film, Session session) {
+        return scheduleRepository.findAllByFilmAndSession(film, session);
     }
 }

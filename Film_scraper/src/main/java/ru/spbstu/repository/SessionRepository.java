@@ -12,6 +12,6 @@ import java.util.Optional;
 @Repository
 public interface SessionRepository extends JpaRepository<Session, Long> {
     Optional<Session> findByDateTime(LocalDateTime dateTime);
-    List<Session> findAllByDateTimeGreaterThanAndDateTimeBefore(LocalDateTime dateTime, LocalDateTime endOfDate);
+    List<Session> findAllByDateTimeIsAfterAndDateTimeIsBefore(LocalDateTime dateTime, LocalDateTime endOfDate);
 }
 

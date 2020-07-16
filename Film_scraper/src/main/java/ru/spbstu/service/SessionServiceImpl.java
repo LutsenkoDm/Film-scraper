@@ -6,6 +6,7 @@ import ru.spbstu.entity.Session;
 import ru.spbstu.exeption.SessionNotFoundExeption;
 import ru.spbstu.repository.SessionRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,5 +29,11 @@ public class SessionServiceImpl implements SessionService {
         } else {
             throw new SessionNotFoundExeption("Not found!");
         }
+    }
+
+    @Override
+    public List<Session> findSessionByDates(LocalDateTime thisDay, LocalDateTime dayPlusOne) {
+
+        return sessionRepository.findAllByDateTimeIsAfterAndDateTimeIsBefore(thisDay, dayPlusOne);
     }
 }

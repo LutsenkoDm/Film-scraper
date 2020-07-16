@@ -12,5 +12,5 @@ import java.util.List;
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
   List<Schedule> findAllBySession(Session session);
-  List<Schedule> findAllByFilm(Film film);
+  List<Schedule> findAllByFilmAndSession(Film film, Session session);
 }
