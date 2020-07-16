@@ -29,7 +29,7 @@ public class Scraper {
     private static String duration;
     private static String actors;
     private static String description;
-    private static final String[] imageRefs = new String[4];
+    private static String[] imageRefs;
     private static double rating;
     private static final List<Film> previousDaysFilms = new ArrayList<>();
 
@@ -64,7 +64,7 @@ public class Scraper {
 
     private List<Session> getFilmSessionList(String filmHref) {
         List<Session> sessionList = new ArrayList<>();
-        driver.get(filmHref + cityUrl);//Жмем кнопку переводящую нас на страницу с сеансами данного фильма
+        driver.get(filmHref + cityUrl);//Переходим на страницу с сеансами данного фильма
         List<WebElement> schedulerItems = driver.findElements(By.xpath("//*[@class=\"schedule-item\"]"));//Получаем элемент с названием кнотеатра и временем в нем
         for (WebElement item : schedulerItems) {
             String cinemaName = item.findElement(By.xpath(".//*[@class=\"schedule-item__left\"]//a")).getText();//Получаем название кинотеатра
@@ -122,7 +122,8 @@ public class Scraper {
                             break;
                     }
                 }
-                imageRefs[0] = driver.findElement(By.xpath("//*[@class=\"styles_root__3uUGx\"]/img")).getAttribute("src");
+                imageRefs = new String[4];
+                imageRefs[0] = driver.findElement(By.xpath("//div[@class=\"styles_root__3uUGx\"]/img")).getAttribute("src");
                 driver.get(href + "images");
                 List<WebElement> filmImages = driver.findElements(By.xpath("//table[@class=\"js-rum-hero fotos\"]/tbody/tr[1]//td/a/img"));
                 for (int i = 0; i < filmImages.size(); i++) {
