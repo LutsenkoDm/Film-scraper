@@ -50,7 +50,6 @@ public class EmailServiceImpl implements EmailService {
 
 
   private List<Film> getRecommendedFilms() {
-    //TODO Заменить на получения фильмов из списка рекомендаций!
     return filmRepository.findAll();
   }
 
