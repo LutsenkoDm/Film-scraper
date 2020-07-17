@@ -29,12 +29,12 @@ public class Scraper {
     private static String duration;
     private static String actors;
     private static String description;
-    private static final String[] imageRefs = new String[4];
+    private static String[] imageRefs;
     private static double rating;
     private static final List<Film> previousDaysFilms = new ArrayList<>();
 
     static {
-        System.setProperty("webdriver.gecko.driver", "geckodriver.exe");
+        System.setProperty("webdriver.gecko.driver", "drivers\\geckodriver.exe");
         url = "https://www.kinopoisk.ru/";
         cityUrl = "afisha/city/2/";
         Proxy proxy = new Proxy();
@@ -64,7 +64,7 @@ public class Scraper {
 
     private List<Session> getFilmSessionList(String filmHref) {
         List<Session> sessionList = new ArrayList<>();
-        driver.get(filmHref + cityUrl);//Жмем кнопку переводящую нас на страницу с сеансами данного фильма
+        driver.get(filmHref + cityUrl);//Переходим на страницу с сеансами данного фильма
         List<WebElement> schedulerItems = driver.findElements(By.xpath("//*[@class=\"schedule-item\"]"));//Получаем элемент с названием кнотеатра и временем в нем
         for (WebElement item : schedulerItems) {
             String cinemaName = item.findElement(By.xpath(".//*[@class=\"schedule-item__left\"]//a")).getText();//Получаем название кинотеатра
@@ -84,24 +84,24 @@ public class Scraper {
         List<Film> thisDayFilms = new ArrayList<>();
         for (String href : getFilmHrefs(day)) {//Идем по списку со всеми ссылками на фильмы в этот день
             driver.get(href);//Переходим на страницу с фильмом
-            String filmTitle = driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[1]/div[1]/div/h1/span")).getText();//Получаем названия фильма
+            String filmTitle = driver.findElement(By.xpath("//span[@class=\"styles_title__2l0HH\"]")).getText();//Получаем названия фильма
             Optional<Film> previousDayFilm = previousDaysFilms.stream().filter(s -> s.getTitle().contains(filmTitle)).findAny();//Ищем такой фильм в уже просмотренных нами
             if (previousDayFilm.isPresent()) {//Если такой был в предыдущие дни
                 previousDayFilm.get().setSessionList(getFilmSessionList(href));//То меняем только сеансы
                 thisDayFilms.add(previousDayFilm.get());//Добавляем его в список фильмов в данный день
             } else {//Если в преыдущие дни такого фильма не было
-                actors = driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[2]/div[2]/div/div[1]/ul")).getText();//Скрапим актеров
+                actors = driver.findElement(By.xpath("//div[@class=\"styles_actors__2zt1j\"]/ul")).getText();//Скрапим актеров
                 actors = actors.substring(0, actors.indexOf('\n', actors.indexOf('\n', actors.indexOf('\n', actors.indexOf('\n') + 1) + 1) + 1));
                 List<WebElement> descriptionOptional = driver.findElements(By.className("styles_paragraph__2Otvx"));
                 description = descriptionOptional.isEmpty() ? "-" : descriptionOptional.get(0).getText();
                 description = description.length() > 252 ? description.substring(0, 252) + "..." : description;
                 try {
-                    rating = Double.parseDouble(driver.findElement(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[1]/div[2]/div/div[1]/span[1]/span")).getText());
+                    rating = Double.parseDouble(driver.findElement(By.xpath("//div[@class=\"film-rating styles_rootMSize__12gaU styles_root__Spxaj styles_rootInLight__Iq2xw\"]/span[1]")).getText());
                 } catch (NumberFormatException exception) {
                     rating = 0.0;
                     exception.printStackTrace();
                 }
-                List<WebElement> filmInfoTableRows = driver.findElements(By.xpath("//html/body/div[1]/div/div[2]/div[2]/div[2]/div/div[3]/div/div/div[2]/div[1]/div/div"));//Скрапим табличку с инфой о фильме
+                List<WebElement> filmInfoTableRows = driver.findElements(By.xpath("//div[@class=\"styles_rowDark__2qC4I styles_row__2ee6F\"]"));//Скрапим табличку с инфой о фильме
                 By rowValueXpath = By.xpath("./div[2]");
                 for (WebElement row : filmInfoTableRows) {//Бежим по ней и ищем интересующие нас характеристики
                       switch (row.findElement(By.xpath("./div[1]")).getText()/*Имя ряда*/) {
@@ -122,7 +122,8 @@ public class Scraper {
                             break;
                     }
                 }
-                imageRefs[0] = driver.findElement(By.xpath("//*[@class=\"styles_root__3uUGx\"]/img")).getAttribute("src");
+                imageRefs = new String[4];
+                imageRefs[0] = driver.findElement(By.xpath("//div[@class=\"styles_root__3uUGx\"]/img")).getAttribute("src");
                 driver.get(href + "images");
                 List<WebElement> filmImages = driver.findElements(By.xpath("//table[@class=\"js-rum-hero fotos\"]/tbody/tr[1]//td/a/img"));
                 for (int i = 0; i < filmImages.size(); i++) {
