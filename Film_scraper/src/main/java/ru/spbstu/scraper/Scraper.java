@@ -97,7 +97,7 @@ public class Scraper {
                 description = descriptionOptional.isEmpty() ? "-" : descriptionOptional.get(0).getText();
                 description = description.length() > 252 ? description.substring(0, 252) + "..." : description;
                 try {
-                    rating = Double.parseDouble(driver.findElement(By.xpath("//div[@class=\"film-rating styles_rootMSize__12gaU styles_root__Spxaj styles_rootInLight__Iq2xw\"]/span[1]")).getText());
+                    rating = Double.parseDouble(driver.findElement(By.xpath("//div[@class=\"film-rating styles_rootLSize__1O_hV styles_root__Spxaj styles_rootInLight__Iq2xw\"]/span[1]")).getText());
                 } catch (NumberFormatException exception) {
                     rating = 0.0;
                     exception.printStackTrace();
