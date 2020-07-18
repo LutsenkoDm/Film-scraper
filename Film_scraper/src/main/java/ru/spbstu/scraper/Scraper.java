@@ -5,6 +5,7 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.CapabilityType;
@@ -34,15 +35,15 @@ public class Scraper {
     private static final List<Film> previousDaysFilms = new ArrayList<>();
 
     static {
-        System.setProperty("webdriver.gecko.driver", "drivers\\geckodriver.exe");
         url = "https://www.kinopoisk.ru/";
         cityUrl = "afisha/city/2/";
         Proxy proxy = new Proxy();
         proxy.setHttpProxy("localhost:8888");
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(CapabilityType.PROXY, proxy);
-        FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
+        FirefoxOptions firefoxOptions = new FirefoxOptions();
         firefoxOptions.addArguments("--headless");
+        firefoxOptions.setLogLevel(FirefoxDriverLogLevel.TRACE);
         driver = new FirefoxDriver(firefoxOptions);
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         FirefoxProfile profile = new FirefoxProfile();
